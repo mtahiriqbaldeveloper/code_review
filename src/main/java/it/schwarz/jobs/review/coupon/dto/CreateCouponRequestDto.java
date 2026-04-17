@@ -7,9 +7,8 @@ import java.math.BigDecimal;
 
 public record CreateCouponRequestDto(
 
-        @NotNull
-        @Size(min = 1, max = 20)
         @NotBlank
+        @Size(max = 20)
         String code,
 
         @NotNull
@@ -22,9 +21,8 @@ public record CreateCouponRequestDto(
         @Max(10000)
         BigDecimal minBasketValue,
 
-        @NotNull
-        @Size(min = 1, max = 1000)
         @NotBlank
+        @Size(max = 1000)
         String description) {
 
     public CouponPayload toCouponPayload() {

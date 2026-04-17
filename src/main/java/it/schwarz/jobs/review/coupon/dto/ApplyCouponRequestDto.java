@@ -11,7 +11,7 @@ public record ApplyCouponRequestDto(
         BasketDto basket,
 
         @NotBlank
-        @Size(min = 1, max = 20)
+        @Size(max = 20)
         String couponCode
 ) {
 }
