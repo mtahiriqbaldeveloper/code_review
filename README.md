@@ -30,5 +30,13 @@ Set the profile to "dev" in the settings of your IDE.
 `java -jar -Dspring.profiles.active=dev ./target/coupon-0.0.1-SNAPSHOT.jar`
 
 #### Production Environment
-`java -jar -Dspring.profiles.active=prd ./target/coupon-0.0.1-SNAPSHOT.jar`
+Start the PostgreSQL container first:
+```bash
+docker-compose up -d
+```
+
+Then run the application:
+```bash
+java -jar -Dspring.profiles.active=prd ./target/coupon-0.0.1-SNAPSHOT.jar
+```
 
