@@ -1,6 +1,4 @@
-package it.schwarz.jobs.review.coupon.api.dto;
-
-import it.schwarz.jobs.review.coupon.domain.entity.ApplicationResult;
+package it.schwarz.jobs.review.coupon.dto;
 
 import java.math.BigDecimal;
 
@@ -11,8 +9,8 @@ public record ApplyCouponResponseDto(
 
     public static ApplyCouponResponseDto of(ApplicationResult applicationResult) {
         return new ApplyCouponResponseDto(new BasketDto(
-                applicationResult.getBasket().getValue().toBigDecimal()),
-                applicationResult.getAppliedCoupon().getDiscount().toBigDecimal()
+                applicationResult.basket().value().toBigDecimal()),
+                applicationResult.appliedCoupon().discount().toBigDecimal()
         );
     }
 }

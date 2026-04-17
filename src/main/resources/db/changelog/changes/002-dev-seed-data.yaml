@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-dev-seed-data
+      author: developer
+      context: dev,test
+      changes:
+        - insert:
+            tableName: COUPON
+            columns:
+              - column:
+                  name: CODE
+                  value: TEST_05_50
+              - column:
+                  name: DISCOUNT
+                  valueNumeric: 5.00
+              - column:
+                  name: MIN_BASKET_VALUE
+                  valueNumeric: 50.00
+              - column:
+                  name: DESCRIPTION
+                  value: Get 5 Euro discount if you spend at least 50 Euro
+        - insert:
+            tableName: COUPON
+            columns:
+              - column:
+                  name: CODE
+                  value: TEST_15_100
+              - column:
+                  name: DISCOUNT
+                  valueNumeric: 15.00
+              - column:
+                  name: MIN_BASKET_VALUE
+                  valueNumeric: 100.00
+              - column:
+                  name: DESCRIPTION
+                  value: Get 15 Euro discount if you spend at least 100 Euro
+        - insert:
+            tableName: COUPON
+            columns:
+              - column:
+                  name: CODE
+                  value: TEST_40_200
+              - column:
+                  name: DISCOUNT
+                  valueNumeric: 40.00
+              - column:
+                  name: MIN_BASKET_VALUE
+                  valueNumeric: 200.00
+              - column:
+                  name: DESCRIPTION
+                  value: Get 40 Euro discount if you spend at least 200 Euro

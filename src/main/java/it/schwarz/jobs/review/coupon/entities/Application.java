@@ -1,4 +1,4 @@
-package it.schwarz.jobs.review.coupon.provider.jpa;
+package it.schwarz.jobs.review.coupon.entities;
 
 
 import jakarta.persistence.*;
@@ -7,25 +7,25 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "APPLICATION")
-public class ApplicationJpaEntity {
+public class Application {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private long id;
 
-    @Column(name = "COUPON_CODE", nullable = false)
-    private String couponCode;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "COUPON_ID", nullable = false)
+    private Coupon coupon;
 
     @Column(name = "TIMESTAMP", nullable = false)
     private Instant timestamp;
 
 
-    public ApplicationJpaEntity() {
+    public Application() {
     }
 
-    public ApplicationJpaEntity(String code, Instant timestamp) {
-        this.couponCode = code;
+    public Application(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -33,8 +33,12 @@ public class ApplicationJpaEntity {
         return id;
     }
 
-    public String getCouponCode() {
-        return couponCode;
+    public Coupon getCoupon() {
+        return coupon;
+    }
+
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
     }
 
     public Instant getTimestamp() {

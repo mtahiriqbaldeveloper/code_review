@@ -1,11 +1,7 @@
-package it.schwarz.jobs.review.coupon.api.dto;
+package it.schwarz.jobs.review.coupon.dto;
 
-import it.schwarz.jobs.review.coupon.domain.entity.AmountOfMoney;
-import it.schwarz.jobs.review.coupon.domain.entity.Coupon;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import it.schwarz.jobs.review.coupon.common.AmountOfMoney;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
@@ -13,6 +9,7 @@ public record CreateCouponRequestDto(
 
         @NotNull
         @Size(min = 1, max = 20)
+        @NotBlank
         String code,
 
         @NotNull
@@ -27,10 +24,11 @@ public record CreateCouponRequestDto(
 
         @NotNull
         @Size(min = 1, max = 1000)
+        @NotBlank
         String description) {
 
-    public Coupon toCoupon() {
-        return new Coupon(
+    public CouponPayload toCouponPayload() {
+        return new CouponPayload(
                 code,
                 AmountOfMoney.of(discount),
                 AmountOfMoney.of(minBasketValue),

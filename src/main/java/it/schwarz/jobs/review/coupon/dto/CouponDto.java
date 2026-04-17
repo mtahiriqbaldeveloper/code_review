@@ -1,4 +1,4 @@
-package it.schwarz.jobs.review.coupon.api.dto;
+package it.schwarz.jobs.review.coupon.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

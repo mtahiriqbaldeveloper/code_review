@@ -1,6 +1,4 @@
-package it.schwarz.jobs.review.coupon.api.dto;
-
-import it.schwarz.jobs.review.coupon.domain.entity.CouponApplications;
+package it.schwarz.jobs.review.coupon.dto;
 
 import java.time.Instant;
 import java.util.List;
@@ -11,7 +9,7 @@ public record GetCouponApplicationsResponseDto(
 ) {
     public static GetCouponApplicationsResponseDto of(CouponApplications couponApplications) {
         return new GetCouponApplicationsResponseDto(
-                couponApplications.getCouponCode(),
-                couponApplications.getApplicationTimestamps());
+                couponApplications.couponCode(),
+                couponApplications.applicationTimestamps());
     }
 }

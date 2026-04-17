@@ -1,4 +1,4 @@
-package it.schwarz.jobs.review.coupon.api.dto;
+package it.schwarz.jobs.review.coupon.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
