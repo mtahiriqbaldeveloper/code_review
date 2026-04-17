@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(path = "/api/coupons")
+@RequestMapping("/api/coupons")
 public class CouponController {
 
     private final CouponService couponService;
@@ -17,33 +17,24 @@ public class CouponController {
         this.couponService = couponService;
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<GetCouponsResponseDto> getCoupons() {
-        var coupons = couponService.findAllCoupons();
-        var response = GetCouponsResponseDto.of(coupons);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(GetCouponsResponseDto.of(couponService.findAllCoupons()));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<CreateCouponResponseDto> createCoupon(@Valid @RequestBody CreateCouponRequestDto request) {
-        var coupon = request.toCouponPayload();
-        var couponCreated = couponService.createCoupon(coupon);
-        var response = CreateCouponResponseDto.of(couponCreated);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CreateCouponResponseDto.of(couponService.createCoupon(request.toCouponPayload())));
     }
 
     @GetMapping("/{couponCode}/applications")
     public ResponseEntity<GetCouponApplicationsResponseDto> getCouponApplications(@PathVariable String couponCode) {
-        var couponApplications = couponService.getApplications(couponCode);
-        var response = GetCouponApplicationsResponseDto.of(couponApplications);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(GetCouponApplicationsResponseDto.of(couponService.getApplications(couponCode)));
     }
 
     @PostMapping("/applications")
     public ResponseEntity<ApplyCouponResponseDto> applyCoupon(@Valid @RequestBody ApplyCouponRequestDto request) {
-        var applicationResult = couponService.applyCoupon(request.basket().toBasket(), request.couponCode());
-        var response = ApplyCouponResponseDto.of(applicationResult);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApplyCouponResponseDto.of(couponService.applyCoupon(request.basket().toBasket(), request.couponCode())));
     }
-
 }
