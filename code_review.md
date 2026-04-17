@@ -50,14 +50,8 @@
   - Transactional read boundary around full mapping (`@Transactional(readOnly = true)`), and/or
   - Explicit fetch strategies (`join fetch`, DTO projection query) to avoid lazy access outside persistence context.
 
-### CR-07 Hidden N+1 behavior (especially with OSIV enabled)
 
-- **Location:** any controller/service mapping that touches lazy nested associations per item
-- **Issue:** Entity lists are loaded first, related data fetched per row later.
-- **Impact:** Significant performance degradation as dataset grows.
-- **Suggestion:** Use repository-level fetch joins or projection queries for list endpoints.
-
-### CR-09 Controller/service code verbosity
+### CR-07 Controller/service code verbosity
 
 - **Location:** controller mapping methods and straightforward pass-through sections
 - **Issue:** Temporary variables and comments add noise without changing behavior.
@@ -65,7 +59,7 @@
 - **Suggestion:** Keep direct transformations concise; remove redundant comments/temps where intent is obvious.
 
 
-### CR-10 Domain value object hardening opportunity (`AmountOfMoney`)
+### CR-08 Domain value object hardening opportunity (`AmountOfMoney`)
 
 - **Location:** money value object creation/comparison/subtraction paths
 - **Issue:** Invariant checks can be strengthened for null and negative-result safety.
@@ -75,14 +69,14 @@
   - non-negative invariant in constructor/factory,
   - subtraction guard against negative result with explicit error.
 
-### CR-11 Structural maintainability improvements
+### CR-09 Structural maintainability improvements
 
 - **Location:** package and class organization
 - **Issue:** Mixed concerns across layers reduce discoverability.
 - **Impact:** Harder onboarding and maintenance.
 - **Suggestion:** Keep clear boundaries (`controller`, `dto`, `service`, `repo`, `entities`, `exception`) and use conventional Spring naming (`*Controller`, `*Service`, `*Repository`).
 
-### CR-12 Candidate immutable domain types can be converted to records
+### CR-10 Candidate immutable domain types can be converted to records
 
 - **Location:** `ApplicationResult`, `Basket`, `Coupon`, `CouponApplications`
 - **Issue:** Data carrier classes appear primarily immutable and may contain boilerplate constructors/accessors.
@@ -99,7 +93,7 @@ public record Coupon(String code, AmountOfMoney discount, AmountOfMoney minBaske
 }
 ```
 
-### CR-13 Coupon/Application entity remodeling and mapping integrity
+### CR-11 Coupon/Application entity remodeling and mapping integrity
 
 - **Location:** `Coupon` and `Application` persistence entities
 - **Bug:** `Coupon` used `@OneToMany(mappedBy = "couponCode")` while `Application` only had a string `COUPON_CODE`, not a JPA association, so the mapping was invalid and the DB could not enforce a real parent-child link.
@@ -122,7 +116,7 @@ Implemented in `CouponExceptionHandler` as follows:
 - `BusinessException` (no more specific handler) -> `400 Bad Request` — in this codebase every `BusinessException` subclass is covered above, so plain `BusinessException` or a new subclass without its own handler would use this
 - any other unhandled `Exception` -> `500 Internal Server Error`
 
-### CR-14 Replace Hibernate DDL auto with Liquibase migrations
+### CR-12 Replace Hibernate DDL auto with Liquibase migrations
 
 - **Location:** `application-prd.properties`, schema management
 - **Issue:** Production used `spring.jpa.hibernate.ddl-auto=update`, letting Hibernate modify schema automatically.
@@ -154,7 +148,12 @@ Integration tests now run against a **PostgreSQL** container (`AbstractPostgresI
 ## Future improvements
 
 - **OpenAPI / Swagger:** Add SpringDoc OpenAPI (or similar) so the coupon API is documented interactively and can be tried from the browser. For now, manual checks are covered by **`curl-api-tests.md`** and **`test-coupons-api.sh`**.
-- **Pageable coupon list:** The endpoint that returns all coupons should support **pagination** (and optional sorting/filtering) so clients do not pull an unbounded list and stress the API or database as the catalog grows.
+- **Pageable coupon list:** The endpoint that returns all coupons and applications should support **pagination** (and 
+  optional sorting/filtering) so clients do not pull an unbounded list and stress the API or database as the catalog grows.
+- **Caching and database indexing:** Use **indexes** on columns used in lookups and joins (e.g. coupon `code`, foreign keys on `APPLICATION`) so queries stay fast as data grows. Add **caching** (e.g. Spring Cache on hot read paths like coupon-by-code or list summaries) where staleness is acceptable, with clear eviction or TTL when coupons change.
+- **API versioning:** Introduce a **versioned base path** (e.g. `/api/v1/coupons`) or header-based negotiation so breaking changes can ship without silently breaking existing clients. That improves **scalability** (roll out new behavior behind a new version) and **maintainability** (deprecate old versions on a clear timeline).
+- **Admin panel:** Provide a small **admin UI** (or internal tool) so operators can perform **CRUD** on coupons, inspect usage, and disable or fix bad data without direct database access or raw API calls. Protect it with **authentication and authorization** (admin-only roles).
+- **Structured logging and observability:** Add **structured logs** (e.g. JSON with correlation/request IDs) for key flows—coupon creation, apply, conflicts, and errors—so operators can trace requests and spot anomalies. Combine with **metrics** (latency, error rates, apply volume) and **health checks** (`/actuator/health` or similar) to monitor overall service health and tune capacity.
 - **Richer coupon and application model:**
   - **Coupon:** Model **coupon kinds** (e.g. one-time use vs reusable), **expiry**, and **validity windows** (valid from / valid to). Validation rules when applying a coupon would enforce these constraints alongside min basket and discount rules.
   - **Application:** Add an **`orderId`** (or equivalent business key) for the order on which the coupon was applied. That supports **returns and refunds**: when an order is cancelled or returned, the system can identify the application and optionally **restore** coupon eligibility (e.g. release a one-time-use coupon back to the customer).
