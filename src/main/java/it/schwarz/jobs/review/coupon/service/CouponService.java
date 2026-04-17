@@ -53,7 +53,7 @@ public class CouponService {
     }
 
     public ApplicationResult applyCoupon(Basket basket, String couponCode) {
-        Coupon coupon = coupons.findByCode(couponCode)
+        Coupon coupon = coupons.findByCodeFetchingApplications(couponCode)
                 .orElseThrow(() -> new CouponCodeNotFoundException(NOT_FOUND.formatted(couponCode)));
 
         CouponPayload couponPayload = CouponMapper.toPayload(coupon);
@@ -70,11 +70,6 @@ public class CouponService {
     }
 
     private static void validateBasketValue(AmountOfMoney basketValue, CouponPayload coupon) {
-        if (basketValue.isLessThan(coupon.discount())) {
-            throw new BasketValueTooLowException(
-                    "The basket value (%s) must not be less than the discount (%s)."
-                            .formatted(basketValue.toBigDecimal(), coupon.discount().toBigDecimal()));
-        }
         if (basketValue.isLessThan(coupon.minBasketValue())) {
             throw new BasketValueTooLowException(
                     "The basket value (%s) must not be less than the min. allowed basket value (%s)."
@@ -92,6 +87,11 @@ public class CouponService {
             throw new CouponNotValidException(
                     "Coupon %s is not valid. Min. basket value (%s) must not be negative."
                             .formatted(coupon.code(), coupon.minBasketValue().toBigDecimal()));
+        }
+        if (coupon.minBasketValue().isLessThan(coupon.discount())) {
+            throw new CouponNotValidException(
+                    "Coupon %s is not valid. Min. basket value (%s) must not be less than discount (%s)."
+                            .formatted(coupon.code(), coupon.minBasketValue().toBigDecimal(), coupon.discount().toBigDecimal()));
         }
     }
 }
